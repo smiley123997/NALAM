@@ -1,15 +1,18 @@
-const CACHE = 'nalam-v1';
+const CACHE = 'nalam-v2';
 const FILES = [
   './',
   './index.html',
   './app.js',
   './manifest.json',
-  'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Lato:wght@400;700&display=swap'
+  './icon.png',
+  './icon192.png'
 ];
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(FILES)).then(() => self.skipWaiting())
+    caches.open(CACHE)
+      .then(cache => cache.addAll(FILES))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -23,6 +26,9 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request).catch(() => caches.match('./index.html')))
+    caches.match(e.request)
+      .then(cached => cached || fetch(e.request)
+        .catch(() => caches.match('./index.html'))
+      )
   );
 });
