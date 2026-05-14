@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Nalam">
+<meta name="theme-color" content="#2d7a4f">
+<link rel="manifest" href="manifest.json">
+<title>Nalam · நலம்</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Lato:wght@400;700&display=swap');
+
+  :root {
+    --green: #2d7a4f;
+    --green-light: #e8f5ee;
+    --green-mid: #4caf78;
+    --orange: #e07b39;
+    --orange-light: #fff3eb;
+    --red: #d94f4f;
+    --blue: #3a6ea5;
+    --blue-light: #eaf1fb;
+    --bg: #f5f7f5;
+    --card: #ffffff;
+    --text: #1e2d1f;
+    --muted: #7a8f7c;
+    --border: #dce8dc;
+    --radius: 16px;
+    --shadow: 0 2px 12px rgba(45,122,79,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #2d7a4f 0%, #1a5c36 100%);
+    color: white;
+    padding: 20px 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+  }
+  .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .app-name { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 800; }
+  .app-name span { opacity: 0.75; font-size: 13px; font-weight: 400; display: block; }
+  .date-badge { background: rgba(255,255,255,0.15); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600; }
+
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .stat-box { background: rgba(255,255,255,0.15); border-radius: 12px; padding: 8px 6px; text-align: center; }
+  .stat-val { font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800; line-height: 1; }
+  .stat-lbl { font-size: 10px; opacity: 0.8; margin-top: 2px; }
+
+  .progress-wrap { background: rgba(255,255,255,0.2); border-radius: 8px; height: 8px; overflow: hidden; }
+  .progress-bar { height: 100%; background: #7eeaaa; border-radius: 8px; transition: width 0.6s ease; }
+  .progress-label { display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; opacity: 0.85; }
+
+  .tabs {
+    display: flex;
+    background: white;
+    position: sticky;
+    top: 164px;
+    z-index: 99;
+    border-bottom: 2px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: none;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    border: none;
+    background: none;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+  }
+  .tab.active { color: var(--green); border-bottom-color: var(--green); }
+
+  .page { display: none; padding: 16px; }
+  .page.active { display: block; }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--green);
+    margin-bottom: 12px;
+  }
+
+  .chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .chip {
+    background: var(--green-light);
+    color: var(--green);
+    border: 1.5px solid #b8ddc8;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+  }
+  .chip:active { transform: scale(0.95); }
+  .chip.orange { background: var(--orange-light); color: var(--orange); border-color: #f5c4a0; }
+
+  .section-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin: 10px 0 8px; }
+
+  .input-row { display: flex; gap: 8px; margin-top: 8px; }
+  .inp {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: 'Lato', sans-serif;
+    background: var(--bg);
+    outline: none;
+    color: var(--text);
+  }
+  .inp:focus { border-color: var(--green); }
+  .btn {
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+  }
+  .btn:active { opacity: 0.85; }
+  .btn.orange { background: var(--orange); }
+
+  .log-list { margin-top: 8px; }
+  .log-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .log-item:last-child { border-bottom: none; }
+  .log-item .name { font-weight: 600; }
+  .log-item .cal { font-weight: 700; color: var(--green); }
+  .log-item .cal.burned { color: var(--orange); }
+  .log-item .time { font-size: 11px; color: var(--muted); }
+  .del-btn { background: none; border: none; color: #ccc; font-size: 16px; cursor: pointer; padding: 0 4px; }
+
+  .milestone { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .milestone:last-child { border-bottom: none; }
+  .ms-icon { font-size: 24px; width: 40px; text-align: center; }
+  .ms-info .ms-title { font-weight: 700; font-size: 13px; }
+  .ms-info .ms-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .ms-badge { margin-left: auto; background: var(--green-light); color: var(--green); border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .ms-badge.done { background: #d4f5e0; color: #1a7a3e; }
+
+  .weight-item { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .weight-item:last-child { border-bottom: none; }
+  .w-val { font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 800; }
+  .w-change { font-size: 12px; font-weight: 700; margin-top: 2px; }
+  .w-change.loss { color: var(--green); }
+  .w-change.gain { color: var(--red); }
+
+  .meal-items { font-size: 13px; line-height: 1.8; padding-left: 4px; }
+  .meal-items li { list-style: disc; margin-left: 16px; }
+
+  .check-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+  .check-item:last-child { border-bottom: none; }
+  .check-box { width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; transition: all 0.2s; }
+  .check-item.done .check-box { background: var(--green); border-color: var(--green); }
+  .check-item.done .check-text { text-decoration: line-through; color: var(--muted); }
+  .check-text { font-size: 13px; }
+
+  .summary-box { background: linear-gradient(135deg, #e8f5ee, #d0eddf); border-radius: 12px; padding: 12px 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .summary-box .s-label { font-size: 12px; color: var(--green); font-weight: 700; }
+  .summary-box .s-val { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 800; color: var(--green); }
+
+  .info-box { background: #fff8e1; border-left: 4px solid #f5c518; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #7a6000; line-height: 1.6; }
+
+  .empty-state { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+  .empty-state .e-icon { font-size: 32px; margin-bottom: 6px; }
+
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1a5c36;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    display: flex;
+    border-top: 1px solid var(--border);
+    z-index: 200;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .nav-btn {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 10px 4px 8px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    font-family: 'Nunito', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .nav-btn .nav-icon { font-size: 20px; }
+  .nav-btn.active { color: var(--green); }
+
+  /* Install banner */
+  #installBanner {
+    display: none;
+    background: #1a5c36;
+    color: white;
+    padding: 12px 16px;
+    text-align: center;
+    font-size: 13px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  #installBanner button {
+    background: white;
+    color: #1a5c36;
+    border: none;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-weight: 800;
+    font-family: 'Nunito', sans-serif;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- INSTALL BANNER -->
+<div id="installBanner">
+  📲 Add Nalam to your Home Screen! <button onclick="installApp()">Install</button>
+  <button onclick="document.getElementById('installBanner').style.display='none'" style="background:transparent;color:white;margin-left:4px">✕</button>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="app-name">🌿 Nalam <span>நலம் · Your Wellness Companion</span></div>
+    <div class="date-badge" id="todayDate"></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-val" id="hCalIn">0</div><div class="stat-lbl">🍽 Cal In</div></div>
+    <div class="stat-box"><div class="stat-val" id="hCalBurned">0</div><div class="stat-lbl">🔥 Burned</div></div>
+    <div class="stat-box"><div class="stat-val" id="hDeficit">0</div><div class="stat-lbl">📉 Deficit</div></div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="goalBar" style="width:0%"></div></div>
+  <div class="progress-label">
+    <span id="currentWeightLabel">Current: -- kg</span>
+    <span id="goalWeightLabel">Goal: 65 kg</span>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('log')">📋 Log</button>
+  <button class="tab" onclick="showTab('progress')">📈 Progress</button>
+  <button class="tab" onclick="showTab('weight')">⚖️ Weight</button>
+  <button class="tab" onclick="showTab('diet')">🥗 Diet Plan</button>
+  <button class="tab" onclick="showTab('skin')">✨ Skin</button>
+</div>
+
+<!-- LOG TAB -->
+<div class="page active" id="page-log">
+  <div class="card">
+    <div class="card-title">🍽 Log Food</div>
+    <div class="section-label">Morning</div>
+    <div class="chip-group">
+      <div class="chip" onclick="addFood('Idli ×2',130)">Idli ×2 · 130</div>
+      <div class="chip" onclick="addFood('Ragi Porridge',150)">Ragi Porridge · 150</div>
+      <div class="chip" onclick="addFood('Kavuni Kanji',120)">Kavuni Kanji · 120</div>
+      <div class="chip" onclick="addFood('Oats Upma',180)">Oats Upma · 180</div>
+      <div class="chip" onclick="addFood('Boiled Egg',70)">Boiled Egg · 70</div>
+      <div class="chip" onclick="addFood('Banana',90)">Banana · 90</div>
+    </div>
+    <div class="section-label">Lunch / Dinner</div>
+    <div class="chip-group">
+      <div class="chip" onclick="addFood('Brown Rice 1cup',220)">Brown Rice · 220</div>
+      <div class="chip" onclick="addFood('Kootu 1cup',130)">Kootu · 130</div>
+      <div class="chip" onclick="addFood('Sambar 1cup',80)">Sambar · 80</div>
+      <div class="chip" onclick="addFood('Rasam',40)">Rasam · 40</div>
+      <div class="chip" onclick="addFood('Dal 1cup',160)">Dal · 160</div>
+      <div class="chip" onclick="addFood('Chapati ×2',160)">Chapati ×2 · 160</div>
+      <div class="chip" onclick="addFood('Curd 1cup',100)">Curd · 100</div>
+    </div>
+    <div class="section-label">Snacks / Drinks</div>
+    <div class="chip-group">
+      <div class="chip" onclick="addFood('Buttermilk',35)">Buttermilk · 35</div>
+      <div class="chip" onclick="addFood('Tender Coconut',45)">Tender Coconut · 45</div>
+      <div class="chip" onclick="addFood('Fruits Bowl',80)">Fruits · 80</div>
+      <div class="chip" onclick="addFood('Nuts handful',160)">Nuts · 160</div>
+      <div class="chip" onclick="addFood('Green Tea',2)">Green Tea · 2</div>
+    </div>
+    <div class="section-label">Custom Food</div>
+    <div class="input-row">
+      <input class="inp" id="customFoodName" placeholder="Food name" />
+      <input class="inp" id="customFoodCal" placeholder="Cal" type="number" style="max-width:80px" />
+      <button class="btn" onclick="addCustomFood()">+ Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📝 Today's Food Log</div>
+    <div id="foodLogList"><div class="empty-state"><div class="e-icon">🍽</div>No food logged yet</div></div>
+    <div id="totalCalIn" style="text-align:right;font-weight:800;font-size:14px;color:var(--green);margin-top:8px;display:none;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏃 Log Activity</div>
+    <div class="section-label">Quick Picks</div>
+    <div class="chip-group">
+      <div class="chip orange" onclick="addActivity('Morning Walk 30min',150)">Walk 30min · 150</div>
+      <div class="chip orange" onclick="addActivity('Morning Walk 45min',220)">Walk 45min · 220</div>
+      <div class="chip orange" onclick="addActivity('Yoga 30min',130)">Yoga 30min · 130</div>
+      <div class="chip orange" onclick="addActivity('Stretching 15min',60)">Stretching · 60</div>
+      <div class="chip orange" onclick="addActivity('Home Exercises 20min',120)">Home Ex · 120</div>
+      <div class="chip orange" onclick="addActivity('Cycling 30min',200)">Cycling · 200</div>
+      <div class="chip orange" onclick="addActivity('Swimming 30min',250)">Swimming · 250</div>
+      <div class="chip orange" onclick="addActivity('Stairs Climbing',80)">Stairs · 80</div>
+    </div>
+    <div class="section-label">Custom Activity</div>
+    <div class="input-row">
+      <input class="inp" id="customActName" placeholder="Activity name" />
+      <input class="inp" id="customActCal" placeholder="Cal" type="number" style="max-width:80px" />
+      <button class="btn orange" onclick="addCustomActivity()">+ Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔥 Today's Activity Log</div>
+    <div id="actLogList"><div class="empty-state"><div class="e-icon">🏃</div>No activity logged yet</div></div>
+    <div id="totalCalBurned" style="text-align:right;font-weight:800;font-size:14px;color:var(--orange);margin-top:8px;display:none;"></div>
+  </div>
+</div>
+
+<!-- PROGRESS TAB -->
+<div class="page" id="page-progress">
+  <div class="card">
+    <div class="card-title">📊 Today's Summary</div>
+    <div class="summary-box">
+      <div><div class="s-label">Net Deficit Today</div><div class="s-val" id="netDeficit">0 kcal</div></div>
+      <div style="text-align:right"><div class="s-label">Est. Fat Burned</div><div class="s-val" id="fatBurned">0 g</div></div>
+    </div>
+    <div class="info-box">💡 A 500 kcal daily deficit = ~0.5 kg loss per week. Your BMR ~1450 kcal/day.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🎯 Weight Loss Milestones</div>
+    <div id="milestoneList"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📅 Weekly Projection</div>
+    <div id="weeklyProjection" style="font-size:13px;line-height:1.8;"></div>
+  </div>
+</div>
+
+<!-- WEIGHT TAB -->
+<div class="page" id="page-weight">
+  <div class="card">
+    <div class="card-title">⚖️ Log Today's Weight</div>
+    <div class="input-row">
+      <input class="inp" id="weightInput" placeholder="e.g. 82.5" type="number" step="0.1" />
+      <button class="btn" onclick="logWeight()">Save</button>
+    </div>
+    <div style="margin-top:10px;font-size:12px;color:var(--muted);">Weigh yourself in the morning, before eating.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📜 Weight History</div>
+    <div id="weightHistory"><div class="empty-state"><div class="e-icon">⚖️</div>No weight logged yet. Start today!</div></div>
+  </div>
+</div>
+
+<!-- DIET TAB -->
+<div class="page" id="page-diet">
+  <div class="card">
+    <div class="card-title">🌅 Early Morning (6–7 AM)</div>
+    <ul class="meal-items"><li>Warm water with lemon & jeera</li><li>5 soaked almonds</li><li>1 tsp methi seeds soaked overnight</li></ul>
+  </div>
+  <div class="card">
+    <div class="card-title">🍳 Breakfast (8–9 AM) · ~300 kcal</div>
+    <ul class="meal-items"><li>2 Idli + sambar (or) Ragi porridge</li><li>Kavuni kanji once a week</li><li>1 boiled egg or paneer 30g</li><li>1 cup green tea (no sugar)</li></ul>
+  </div>
+  <div class="card">
+    <div class="card-title">🥤 Mid-Morning (11 AM) · ~80 kcal</div>
+    <ul class="meal-items"><li>Buttermilk with curry leaves</li><li>Small seasonal fruit</li></ul>
+  </div>
+  <div class="card">
+    <div class="card-title">🍱 Lunch (1–2 PM) · ~400 kcal</div>
+    <ul class="meal-items"><li>1 cup brown rice / 2 chapati</li><li>Kootu or mixed veg curry</li><li>Sambar + rasam</li><li>1 cup dal</li><li>Salad: cucumber, carrot, beetroot</li><li>100ml curd</li></ul>
+  </div>
+  <div class="card">
+    <div class="card-title">🌙 Evening Snack (5 PM) · ~100 kcal</div>
+    <ul class="meal-items"><li>Tender coconut or roasted chana</li><li>Green tea / herbal tea</li></ul>
+  </div>
+  <div class="card">
+    <div class="card-title">🌃 Dinner (7–7:30 PM) · ~300 kcal</div>
+    <ul class="meal-items"><li>2 chapati / oats / ragi dosa</li><li>Veg soup or dal</li><li>Stir-fried greens</li><li>❌ NO rice at night</li></ul>
+  </div>
+  <div class="card">
+    <div class="card-title">💧 Daily Rules</div>
+    <ul class="meal-items"><li>Drink 3–4 litres water daily</li><li>No sugar in tea/coffee</li><li>No fried snacks or biscuits</li><li>Eat dinner before 8 PM</li><li>Walk 30–45 min daily</li></ul>
+  </div>
+</div>
+
+<!-- SKIN TAB -->
+<div class="page" id="page-skin">
+  <div class="card">
+    <div class="card-title">✨ Daily Glow Checklist</div>
+    <div id="skinChecklist"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🌿 Skin Superfoods</div>
+    <ul class="meal-items" style="line-height:2">
+      <li>🥕 Carrots & tomatoes — natural glow</li>
+      <li>🌿 Drumstick leaves — vitamins</li>
+      <li>🍋 Lemon water — vitamin C & collagen</li>
+      <li>🫐 Berries — antioxidants</li>
+      <li>🥑 Coconut — healthy fats</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-title">🧴 Evening Skin Routine</div>
+    <ul class="meal-items" style="line-height:2">
+      <li>Double cleanse (oil → face wash)</li>
+      <li>Rose water toner</li>
+      <li>Vitamin C serum (alternate nights)</li>
+      <li>Niacinamide / moisturiser</li>
+      <li>SPF 30+ every morning</li>
+      <li>Ubtan / besan pack 2×/week</li>
+    </ul>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="bottom-nav">
+  <button class="nav-btn active" onclick="showTab('log')" id="nav-log"><span class="nav-icon">📋</span>Log</button>
+  <button class="nav-btn" onclick="showTab('progress')" id="nav-progress"><span class="nav-icon">📈</span>Progress</button>
+  <button class="nav-btn" onclick="showTab('weight')" id="nav-weight"><span class="nav-icon">⚖️</span>Weight</button>
+  <button class="nav-btn" onclick="showTab('diet')" id="nav-diet"><span class="nav-icon">🥗</span>Diet</button>
+  <button class="nav-btn" onclick="showTab('skin')" id="nav-skin"><span class="nav-icon">✨</span>Skin</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
